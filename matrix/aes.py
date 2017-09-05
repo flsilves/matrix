@@ -1,42 +1,29 @@
-from hashlib import md5
-from Crypto.Cipher import AES
+# pip install pycrypt
+
+from Crypto.PublicKey import RSA
 from Crypto import Random
 
+# generate new key
+random_generator = Random.new().read
+key = RSA.generate(1024, random_generator)
+public_key = key.publickey()
 
+# encrypt data
+enc_data = public_key.encrypt('abcdefgh'.encode('UTF-8'), 32)
+# decrypt data
+key.decrypt(enc_data)
 
-def derive_key_and_iv(password, salt, key_length, iv_length):
-    d = d_i = ''
-    while len(d) < key_length + iv_length:
-        d_i = md5(d_i + password + salt).digest()
-        d += d_i
-    return d[:key_length], d[key_length:key_length+iv_length]
+# export and import key
+exportedkey = key.exportKey()
+newkey = RSA.importKey(exportedkey)
 
-def encrypt(in_file, out_file, password, key_length=32):
-    bs = AES.block_size
-    salt = Random.new().read(bs - len('Salted__'))
-    key, iv = derive_key_and_iv(password, salt, key_length, bs)
-    cipher = AES.new(key, AES.MODE_CBC, iv)
-    out_file.write('Salted__' + salt)
-    finished = False
-    while not finished:
-        chunk = in_file.read(1024 * bs)
-        if len(chunk) == 0 or len(chunk) % bs != 0:
-            padding_length = (bs - len(chunk) % bs) or bs
-            chunk += padding_length * chr(padding_length)
-            finished = True
-        out_file.write(cipher.encrypt(chunk))
+# export and import key to file
+f = open('mykey.pem','w')
+var = key.exportKey('PEM')
+print(str(var))
+f.write(str(var))
 
-def decrypt(in_file, out_file, password, key_length=32):
-    bs = AES.block_size
-    salt = in_file.read(bs)[len('Salted__'):]
-    key, iv = derive_key_and_iv(password, salt, key_length, bs)
-    cipher = AES.new(key, AES.MODE_CBC, iv)
-    next_chunk = ''
-    finished = False
-    while not finished:
-        chunk, next_chunk = next_chunk, cipher.decrypt(in_file.read(1024 * bs))
-        if len(next_chunk) == 0:
-            padding_length = ord(chunk[-1])
-            chunk = chunk[:-padding_length]
-            finished = True
-        out_file.write(chunk)
+print("here")
+f.close()
+a = open('mykey.pem','r')
+#newkey = RSA.importKey(a.read())
