@@ -1,19 +1,11 @@
-#!/usr/bin/python
 
-import os
 import sys
 from Matrix import *
-from hashlib import md5
-from Crypto.Cipher import AES
-from Crypto import Random
 from aes import *
-import hashlib
-
 
 def main():
-
-    options();
-    #card = Matrix(1)   
+    options()
+    #card = Matrix(1)
     #print(vars(card))
 
 
@@ -28,5 +20,4 @@ def options():
 
 
 if __name__ == '__main__':
-    os.system('clear');
     sys.exit(main())
