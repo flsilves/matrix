@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import sys
 
 Path_main = sys.path[0]
